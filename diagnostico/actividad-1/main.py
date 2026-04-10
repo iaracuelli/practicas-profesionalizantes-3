@@ -1,5 +1,5 @@
 # Vista (Interfaz gráfica de usuario)
-# Permite gestionar proveedores
+
 
 import tkinter as tk
 from tkinter import ttk
@@ -14,14 +14,14 @@ class Application(tk.Tk):
         self.geometry("1000x600")
         self.configure(bg="#e8f0fe")
 
-        # Tema visual
+        
         self.style = ttk.Style(self)
         self.style.theme_use("clam")
 
-        # Controlador de base de datos
+        # controlador de base de datos
         self.material_manager = MaterialManager()
 
-        # Construcción de interfaz
+        # Ccnstrucción de interfaz
         self.crear_menu()
         self.crear_tabla()
         self.actualizar_tabla()
