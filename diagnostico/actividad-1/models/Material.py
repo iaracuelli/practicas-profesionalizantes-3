@@ -3,14 +3,7 @@
 class Material:
     def __init__(self, id, nombre, unidad, cantidad):
         """
-        Representa un proveedor de la empresa.
-
-        Parametros:
-            id (int): Identificador unico del proveedor.
-            nombre (str): Nombre del contacto del proveedor.
-            razon_social (str): Nombre de la empresa proveedora.
-            telefono (str): Teléfono de contacto.
-            direccion (str): Direccion comercial.
+        Representa un material.
         """
         self.__id = id
         self.__nombre = nombre
