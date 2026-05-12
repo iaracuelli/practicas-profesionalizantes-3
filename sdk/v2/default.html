@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8">
+		<title>Menu Principal</title>
+	</head>
+	<body>
+		<h1>Menu Principal</h1>
+		<x-main-panel></x-main-panel>
+	
+
+	<script>
+
+	class MainPanel extends HTMLElement
+	{
+		constructor()
+		{
+			super();
+
+			//usuarios
+			this.titleUsers = document.createElement('h2');
+			this.titleUsers.innerText = 'Usuarios';
+
+			this.btnInsertUser = document.createElement('button');
+			this.btnInsertUser.innerText = 'Insertar Usuario';
+
+			this.btnDeleteUser = document.createElement('button');
+			this.btnDeleteUser.innerText = 'Borrar Usuario';
+
+			this.btnUpdateUser = document.createElement('button');
+			this.btnUpdateUser.innerText = 'Modificar Usuario';
+
+			this.btnGetUser = document.createElement('button');
+			this.btnGetUser.innerText = 'Buscar Usuario';
+
+			this.btnListUsers = document.createElement('button');
+			this.btnListUsers.innerText = 'Listar Usuarios';
+
+			//grupos
+			this.titleGroups = document.createElement('h2');
+			this.titleGroups.innerText = 'Grupos';
+
+			this.btnInsertGroup = document.createElement('button');
+			this.btnInsertGroup.innerText = 'Insertar Grupo';
+
+			this.btnDeleteGroup = document.createElement('button');
+			this.btnDeleteGroup.innerText = 'Borrar Grupo';
+
+			this.btnUpdateGroup = document.createElement('button');
+			this.btnUpdateGroup.innerText = 'Modificar Grupo';
+
+			this.btnGetGroup = document.createElement('button');
+			this.btnGetGroup.innerText = 'Buscar Grupo';
+
+			this.btnListGroups = document.createElement('button');
+			this.btnListGroups.innerText = 'Listar Grupos';
+
+			//miembros
+			this.titleMembers = document.createElement('h2');
+			this.titleMembers.innerText = 'Miembros';
+
+			this.btnAddMember = document.createElement('button');
+			this.btnAddMember.innerText = 'Agregar Miembro';
+
+			this.btnRemoveMember = document.createElement('button');
+			this.btnRemoveMember.innerText = 'Quitar Miembro';
+
+			this.btnGetMembersByGroup = document.createElement('button');
+			this.btnGetMembersByGroup.innerText = 'Ver Usuarios del grupo';
+
+			this.btnGetGroupsByUser = document.createElement('button');
+			this.btnGetGroupsByUser.innerText = 'Ver Grupos de Usuario';
+
+			//endpoints
+			this.titleEndpoints = document.createElement('h2');
+			this.titleEndpoints.innerText = 'Endpoints';
+
+			this.btnInsertEndpoint = document.createElement('button');
+			this.btnInsertEndpoint.innerText = 'Insert Endpoint';
+
+			this.btnDeleteEndpoint = document.createElement('button');
+			this.btnDeleteEndpoint.innerText = 'Borrar Endpoint';
+
+			this.btnUpdateEndpoint = document.createElement('button');
+			this.btnUpdateEndpoint.innerText = 'Modificar Endpoint';
+
+			this.btnGetEndpoint = document.createElement('button');
+			this.btnGetEndpoint.innerText = 'Buscar Endpoint';
+
+			this.btnListEndpoints = document.createElement('button');
+			this.btnListEndpoints.innerText = 'Listar Endpoints';
+
+			//access
+			this.titleAccess = document.createElement('h2');
+			this.titleAccess.innerText = 'Access';
+
+			this.btnAddAccess = document.createElement('button');
+			this.btnAddAccess.innerText = 'Agregar Acceso';
+
+			this.btnRemoveAccess = document.createElement('button');
+			this.btnRemoveAccess.innerText = 'Quitar Acceso';
+
+			this.btnGetAccessByGroup = document.createElement('button');
+			this.btnGetAccessByGroup.innerText = 'Ver Accesos de Grupo';
+
+			this.btnGetGroupsByEndpoint = document.createElement('button');
+			this.btnGetGroupsByEndpoint.innerText = 'Ver Grupos de Endpoints';
+
+			//resultado
+			this.resultArea = document.createElement('pre');
+
+			//al dom
+			this.appendChild(this.titleUsers);
+			this.appendChild(this.btnInsertUser);
+			this.appendChild(this.btnDeleteUser);
+			this.appendChild(this.btnUpdateUser);
+			this.appendChild(this.btnGetUser);
+			this.appendChild(this.btnListUsers);
+
+			this.appendChild(this.titleGroups);
+			this.appendChild(this.btnInsertGroup);
+			this.appendChild(this.btnDeleteGroup);
+			this.appendChild(this.btnUpdateGroup);
+			this.appendChild(this.btnGetGroup);
+			this.appendChild(this.btnListGroups);
+
+			this.appendChild(this.titleMembers);
+			this.appendChild(this.btnAddMember);
+			this.appendChild(this.btnRemoveMember);
+			this.appendChild(this.btnGetMembersByGroup);
+			this.appendChild(this.btnGetGroupsByUser);
+
+			this.appendChild(this.titleEndpoints);
+			this.appendChild(this.btnInsertEndpoint);
+			this.appendChild(this.btnDeleteEndpoint);
+			this.appendChild(this.btnUpdateEndpoint);
+			this.appendChild(this.btnGetEndpoint);
+			this.appendChild(this.btnListEndpoints);
+
+			this.appendChild(this.titleAccess);
+			this.appendChild(this.btnAddAccess);
+			this.appendChild(this.btnRemoveAccess);
+			this.appendChild(this.btnGetAccessByGroup);
+			this.appendChild(this.btnGetGroupsByEndpoint);
+
+			this.appendChild(document.createElement('br'));
+			this.appendChild(document.createElement('br'));
+			this.appendChild(this.resultArea);
+		}
+
+		//handler usuarios
+		async onBtnInsertUserClick()
+		{
+			const username = prompt('Nombre de usuario: ');
+			const password = prompt('Contraseña: ');
+
+			const response = await fetch('/register',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: username, password: password })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+		}
+
+		async onBtnDeleteUserClick()
+        {
+            const id = prompt('ID de usuario a borrar:');
+
+            const response = await fetch('/deleteUser',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		 async onBtnUpdateUserClick()
+        {
+            const id = prompt('ID de usuario a modificar:');
+            const username = prompt('Nuevo nombre de usuario:');
+            const password = prompt('Nueva contraseña:');
+
+            const response = await fetch('/updateUser',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, username: username, password: password })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		   async onBtnGetUserClick()
+        {
+            const id = prompt('ID de usuario a buscar:');
+
+            const response = await fetch(`/getUser?id=${id}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnListUsersClick()
+        {
+            const response = await fetch('/listUsers');
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		//handler grupos
+		async onBtnInsertGroupClick()
+        {
+            const name = prompt('Nombre del grupo:');
+
+            const response = await fetch('/createGroup',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		async onBtnDeleteGroupClick()
+        {
+            const id = prompt('ID de grupo a borrar:');
+
+            const response = await fetch('/deleteGroup',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		async onBtnUpdateGroupClick()
+        {
+            const id = prompt('ID de grupo a modificar:');
+            const name = prompt('Nuevo nombre del grupo:');
+
+            const response = await fetch('/updateGroup',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, name: name })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnGetGroupClick()
+        {
+            const id = prompt('ID de grupo a buscar:');
+
+            const response = await fetch(`/getGroup?id=${id}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		async onBtnListGroupsClick()
+        {
+            const response = await fetch('/listGroups');
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		//handler members
+		async onBtnAddMemberClick()
+        {
+            const id_user = prompt('ID de usuario:');
+            const id_group = prompt('ID de grupo:');
+
+            const response = await fetch('/addMember',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_user: id_user, id_group: id_group })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnRemoveMemberClick()
+        {
+            const id_user = prompt('ID de usuario:');
+            const id_group = prompt('ID de grupo:');
+
+            const response = await fetch('/removeMember',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_user: id_user, id_group: id_group })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnGetMembersByGroupClick()
+        {
+            const id_group = prompt('ID de grupo:');
+
+            const response = await fetch(`/getMembersByGroup?id_group=${id_group}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnGetGroupsByUserClick()
+        {
+            const id_user = prompt('ID de usuario:');
+
+            const response = await fetch(`/getGroupsByUser?id_user=${id_user}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		//handler endpoints
+		async onBtnInsertEndpointClick()
+        {
+            const path = prompt('Path del endpoint:');
+
+            const response = await fetch('/createEndpoint',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: path })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnDeleteEndpointClick()
+        {
+            const id = prompt('ID de endpoint a borrar:');
+
+            const response = await fetch('/deleteEndpoint',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnUpdateEndpointClick()
+        {
+            const id = prompt('ID de endpoint a modificar:');
+            const path = prompt('Nuevo path:');
+
+            const response = await fetch('/updateEndpoint',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, path: path })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnGetEndpointClick()
+        {
+            const id = prompt('ID de endpoint a buscar:');
+
+            const response = await fetch(`/getEndpoint?id=${id}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnListEndpointsClick()
+        {
+            const response = await fetch('/listEndpoints');
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		//handler access
+		 async onBtnAddAccessClick()
+        {
+            const id_group = prompt('ID de grupo:');
+            const id_endpoint = prompt('ID de endpoint:');
+
+            const response = await fetch('/addAccess',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_group: id_group, id_endpoint: id_endpoint })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnRemoveAccessClick()
+        {
+            const id_group = prompt('ID de grupo:');
+            const id_endpoint = prompt('ID de endpoint:');
+
+            const response = await fetch('/removeAccess',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_group: id_group, id_endpoint: id_endpoint })
+            });
+
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnGetAccessByGroupClick()
+        {
+            const id_group = prompt('ID de grupo:');
+
+            const response = await fetch(`/getAccessByGroup?id_group=${id_group}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async onBtnGetGroupsByEndpointClick()
+        {
+            const id_endpoint = prompt('ID de endpoint:');
+
+            const response = await fetch(`/getGroupsByEndpoint?id_endpoint=${id_endpoint}`);
+            const data = await response.json();
+            this.resultArea.innerText = JSON.stringify(data, null, 2);
+        }
+
+		//callbacks
+		connectedCallback()
+		{
+			this.btnInsertUser.onclick = this.onBtnInsertUserClick.bind(this);
+			this.btnDeleteUser.onclick = this.onBtnDeleteUserClick.bind(this);
+			this.btnUpdateUser.onclick = this.onBtnUpdateUserClick.bind(this);
+			this.btnGetUser.onclick = this.onBtnGetUserClick.bind(this);
+			this.btnListUsers.onclick = this.onBtnListUsersClick.bind(this);
+
+			this.btnInsertGroup.onclick = this.onBtnInsertGroupClick.bind(this);
+			this.btnDeleteGroup.onclick = this.onBtnDeleteGroupClick.bind(this);
+			this.btnUpdateGroup.onclick = this.onBtnUpdateGroupClick.bind(this);
+			this.btnGetGroup.onclick = this.onBtnGetGroupClick.bind(this);
+			this.btnListGroups.onclick = this.onBtnListGroupsClick.bind(this);
+
+			this.btnAddMember.onclick = this.onBtnAddMemberClick.bind(this);
+			this.btnRemoveMember.onclick = this.onBtnRemoveMemberClick.bind(this);
+			this.btnGetMembersByGroup.onclick = this.onBtnGetMembersByGroupClick.bind(this);
+			this.btnGetGroupsByUser.onclick = this.onBtnGetGroupsByUserClick.bind(this);
+
+			this.btnInsertEndpoint.onclick = this.onBtnInsertEndpointClick.bind(this);
+			this.btnDeleteEndpoint.onclick = this.onBtnDeleteEndpointClick.bind(this);
+			this.btnUpdateEndpoint.onclick = this.onBtnUpdateEndpointClick.bind(this);
+			this.btnGetEndpoint.onclick = this.onBtnGetEndpointClick.bind(this);
+			this.btnListEndpoints.onclick = this.onBtnListEndpointsClick.bind(this);
+
+			this.btnAddAccess.onclick = this.onBtnAddAccessClick.bind(this);
+			this.btnRemoveAccess.onclick = this.onBtnRemoveAccessClick.bind(this);
+			this.btnGetAccessByGroup.onclick = this.onBtnGetAccessByGroupClick.bind(this);
+			this.btnGetGroupsByEndpoint.onclick = this.onBtnGetGroupsByEndpointClick.bind(this);
+
+		}
+
+		disconnectedCallback()
+		{
+			this.btnInsertUser.onclick = null;
+			this.btnDeleteUser.onclick = null;
+			this.btnUpdateUser.onclick = null;
+			this.btnGetUser.onclick = null;
+			this.btnListUsers.onclick = null;
+
+			this.btnInsertGroup.onclick = null;
+			this.btnDeleteGroup.onclick = null;
+			this.btnUpdateGroup.onclick = null;
+			this.btnGetGroup.onclick = null;
+			this.btnListGroups.onclick = null;
+
+			this.btnAddMember.onclick = null;
+			this.btnRemoveMember.onclick = null;
+			this.btnGetMembersByGroup.onclick = null;
+			this.btnGetGroupsByUser.onclick = null;
+
+			this.btnInsertEndpoint.onclick = null;
+			this.btnDeleteEndpoint.onclick = null;
+			this.btnUpdateEndpoint.onclick = null;
+			this.btnGetEndpoint.onclick = null;
+			this.btnListEndpoints.onclick = null;
+
+			this.btnAddAccess.onclick = null;
+			this.btnRemoveAccess.onclick = null;
+			this.btnGetAccessByGroup.onclick = null;
+			this.btnGetGroupsByEndpoint.onclick = null;
+		}
+	}
+
+	customElements.define('x-main-panel', MainPanel);
+
+	</script>
+
+</body>	
+</html>
+
