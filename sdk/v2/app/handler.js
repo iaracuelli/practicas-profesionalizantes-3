@@ -1,7 +1,8 @@
 // Manejadores
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
-import { config, db } from '../main.js';
+import { config } from '../main.js';
+import { db } from './database.js';
 import { login, createUser, deleteUser, updateUser, getUserById, listUsers } from './user.js';
 import { createGroup, deleteGroup, updateGroup, getGroupById, listGroups } from './group.js';
 import { addMember, removeMember, getMembersByGroup, getGroupsByUser } from './members.js';

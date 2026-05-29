@@ -1,5 +1,38 @@
 // app/database.js
-import { db } from '../main.js';
+import { DatabaseSync } from 'node:sqlite';
+import { resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+
+function load_config()
+{
+    try
+    {
+        const data = readFileSync('./config.json', 'utf-8');
+        return JSON.parse(data);
+    }
+    catch (error)
+    {
+        return { database: { path: './database.db' } };
+    }
+}
+
+
+function connect_db(path) 
+{
+    const dbPath = resolve(path);
+    try 
+    {
+        const db = new DatabaseSync(dbPath);
+        return db;
+    } 
+    catch (err) 
+    {
+        throw new Error("Error al conectar a la base de datos: " + err.message);
+    }
+}
+
+const config = load_config();
+export const db = connect_db(config.database.path);
 
 export function init_database()
 {

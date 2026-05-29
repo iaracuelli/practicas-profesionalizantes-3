@@ -1,5 +1,4 @@
 // Ruteo
-import { createServer } from 'node:http';
 import { URL } from 'node:url';
 import { config } from '../main.js';
 import { default_handler, login_handler, register_handler, show_message_handler, delete_user_handler, 
@@ -55,13 +54,4 @@ async function request_dispatcher(request, response)
     }
 }
 
-function start()
-{
-    console.log('Servidor ejecutándose en http://' + config.server.ip + ':' + config.server.port);
-}
-
-export function init_server()
-{
-    let server = createServer(request_dispatcher);
-    server.listen(config.server.port, config.server.ip, start);
-}
+export { request_dispatcher };

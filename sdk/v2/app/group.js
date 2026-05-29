@@ -1,5 +1,5 @@
 // Lógica de negocio - grupos
-import { db } from '../main.js';
+import { db } from './database.js';  
 
 export function createGroup(db, name)
 {

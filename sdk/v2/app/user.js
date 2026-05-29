@@ -1,5 +1,5 @@
 // Lógica de negocio
-import { db } from '../main.js';
+import { db } from './database.js';
 
 export async function createUser(db, username, password) 
 {
@@ -30,7 +30,7 @@ export function deleteUser(db, id)
     const sql = "DELETE FROM user WHERE id = ?";
 
     const stmt = db.prepare(sql);
-    const result = setImmediate.run(id);
+    const result = stmt.run(id);
 
     return {deleted: result.changes > 0 };
 }
@@ -66,7 +66,7 @@ export function listUsers(db)
 }
 
 
-export function login(input)
+export function login(db, username, password)
 {
     const sql = "SELECT id, username FROM user WHERE username = ? AND password = ?";
 

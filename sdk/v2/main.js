@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
-import { resolve } from 'node:path';
-import { init_server } from './app/router.js';
+import { createServer } from 'node:http';
+import { request_dispatcher } from './app/router.js';
 import { init_database } from './app/database.js';
 
 function default_config() 
@@ -45,24 +44,14 @@ function load_config()
     return config;
 }
 
+export const config = load_config();
 
-function connect_db(path) 
+init_database(); 
+
+function start()
 {
-    const dbPath = resolve(path);
-    try 
-    {
-        const db = new DatabaseSync(dbPath);
-        return db;
-    } 
-    catch (err) 
-    {
-        throw new Error("Error al conectar a la base de datos: " + err.message);
-    }
+    console.log('Servidor ejecutándose en http://' + config.server.ip + ':' + config.server.port);
 }
 
-export const config = load_config();
-export const db = connect_db(config.database.path);
-init_database(); 
-//const output = await createUser(db, 'test', '123456789');s
-
-init_server();
+const server = createServer(request_dispatcher);
+server.listen(config.server.port, config.server.ip, start);

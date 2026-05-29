@@ -1,0 +1,37 @@
+database
+
+user
+id	username	password
+1	lucas		1234
+2	alfredo		1234
+3	joaquin		1234
+4	german		1234
+
+members
+user_id		group_id
+1		1	//lucas es admin
+2		2	//alfredo es finance
+3		3	//joaquin es rrhh
+4		4	//german es storage
+
+endpoints
+id	path
+1	/printAdminFunction
+2	/printMonthlyEval
+3	/printRecibos
+4	/printStock
+
+access
+group_id	endpoint_id
+1		1
+2		3	//finance hace prints de recibos
+3		2	//rrhh hace prints de evaluaciones mensuales
+4		4	//storage hace print de stock
+5		5
+
+groups
+id	name
+1	admin
+2	finance
+3	rrhh
+4	storage
