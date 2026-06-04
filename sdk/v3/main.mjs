@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { URL } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { access, readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { resolve } from 'node:path';
 
@@ -72,19 +72,16 @@ class UserSession
 const db = connect_db(config.database.path);
 //const output = await createUser(db, 'test', '123456789');
 
-function authenticate( username, password )
+function authenticate( username, access_key )
 {
-    //Debería ir a la base de datos y buscar si existe (1) registro  username/password coincidente
-    //Si es verdadero entonces significa que estoy autenticado, sino no.
-
-    const sql = "SELECT count(*) as total FROM `user` WHERE username=? AND password=?";
+    const sql = `SELECT count(*) as total FROM "user" WHERE username=? AND access_key=?`;
 
     try 
     {
         const stmt = db.prepare(sql);
-        const row = stmt.get(username, password);
+        const row = stmt.get(username, access_key);
             
-        return (row.total === 1);
+        return (row.total > 0);
     } 
     catch (err) 
     {
@@ -118,10 +115,10 @@ function authorize( username, endpointPath )
     }
 }
 
-function login( username, password )
+function login( username, access_key )
 {
     
-    let isAuthenticated = authenticate(username, password);
+    let isAuthenticated = authenticate(username, access_key);
 
     if ( isAuthenticated )
     {
@@ -158,9 +155,9 @@ function login( username, password )
     //El retorno de esta función está representando si se devuelve o no un objeto de sesión.
 }
 
-function logout(username, password)
+function logout(username, access_key)
 {
-    let isAuthenticated = authenticate(username, password);
+    let isAuthenticated = authenticate(username, access_key);
 
     if ( isAuthenticated )
     {
@@ -172,7 +169,7 @@ function logout(username, password)
 // Lógica de negocio
 async function createUser(db, username, password) 
 {
-    const sql = "INSERT INTO user (username, password) VALUES (?, ?) RETURNING id";
+    const sql = "INSERT INTO user (username, access_key) VALUES (?, ?) RETURNING id";
 
     try 
     {
@@ -215,8 +212,10 @@ async function login_handler(request, response)
                 // 3. Convertimos el string a objeto (asumiendo que envían JSON)
                 const input = JSON.parse(body);
 
+                const authResult = authenticate(input.username, input.access_key);
+               
                 // 4. Procesamos el login
-                const output = login(input.username, input.password); //El resultado es nulo o un objeto de sesión
+                const output = login(input.username, input.access_key); //El resultado es nulo o un objeto de sesión
 
                 response.writeHead(200, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify(output));
@@ -250,7 +249,7 @@ async function logout_handler(request, response)
             try 
             {
                 const input = JSON.parse(body);
-                login(input.username, input.password);
+                logout(input.username, input.access_key);
 
                 response.writeHead(200, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({ status: 'logged out' }));
@@ -299,36 +298,6 @@ async function register_handler(request, response)
 }
 
 
-function authorize_handler(request, response)
-{
-    let body = '';
-
-    request.on('data', chunk =>
-    {
-        body += chunk.toString();
-    });
-
-    request.on('end', () =>
-    {
-        try
-        {
-            const input = JSON.parse(body);
-            const result = authorize(input.username, input.endpointPath);
-
-            response.writeHead(200, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify({ authorized: result }));
-        }
-        catch (err)
-        {
-            response.writeHead(500, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify({ error: err.message }));
-        }
-    });
-}
-
-
-
-
 function show_message_handler(request, response)
 {
     console.log("Petición recibida: Mostrando mensaje en el servidor!");
@@ -345,7 +314,19 @@ router.set('/logout', logout_handler);
 router.set('/register', register_handler);
 router.set('/showMessage', show_message_handler);
 
-router.set('/authorize', authorize_handler);
+
+router.set('/log', (req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json'});
+    res.end(JSON.stringify({ message: 'Ejecutando /log' }));
+});
+
+router.set('/sayHello', (req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json'});
+    res.end(JSON.stringify({ message: 'Ejecutando /sayHello' }));
+});
+
+
+const publicRoutes = [ '/', '/login', '/logout'];
 
 async function request_dispatcher(request, response)
 {
@@ -353,15 +334,39 @@ async function request_dispatcher(request, response)
     const path = url.pathname;
     const handler = router.get(path);
 
-    if (handler)
-    {
-        return await handler(request, response);
-    }
-    else
+    if (!handler)
     {
         response.writeHead(404);
-        response.end('Método no encontrado');
+        response.end('Metodo no encontrado');
+        return;
     }
+    
+    //si la ruta es publica, pasa
+    if (publicRoutes.includes(path))
+    {
+        return await handler (request, response);
+    }
+
+    //ruta privada, verificamos username
+    const username = request.headers['x-username'];
+
+    if (!username)
+    {
+        response.writeHead(401, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({ error: 'Usuario no identificado' }));
+        return;
+    }
+
+    const isAuthorized = authorize(username, path);
+
+    if(!isAuthorized)
+    {
+        response.writeHead(403, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({ error: 'Acceso denegado' }));
+        return;
+    }
+
+    return await handler(request, response);
 }
 
 function start()

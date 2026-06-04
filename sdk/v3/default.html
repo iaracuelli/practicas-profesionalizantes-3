@@ -20,16 +20,29 @@
 
 <script>
 
+async function calcularHash(cadena)
+{
+    const encoder = new TextEncoder();
+    const data = encoder.encode(cadena);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+
 async function doLogin()
 {
     const username = prompt('Usuario:');
     const password = prompt('Contraseña:');
+
+    const access_key = await calcularHash(password);
     
     const response = await fetch('/login',
     {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, password: password })
+        body: JSON.stringify({ username: username, access_key: access_key })
     });
 
     const data = await response.json();
@@ -40,12 +53,14 @@ async function doLogout()
 {
     const username = prompt('Usuario:');
     const password = prompt('Contraseña:');
+
+    const access_key = await calcularHash(password);
     
     const response = await fetch('/logout',
     {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, password: password })
+        body: JSON.stringify({ username: username, access_key: access_key })
     });
 
     const data = await response.json();
@@ -56,11 +71,11 @@ async function checkAuthorize(endpointPath)
 {
     const username = prompt('Ingresá tu nombre de usuario:');
 
-    const response = await fetch('/authorize',
+    const response = await fetch(endpointPath,
     {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, endpointPath: endpointPath })
+        method: 'GET',
+        headers: { 'x-username': username },
+        
     });
 
     const data = await response.json();
