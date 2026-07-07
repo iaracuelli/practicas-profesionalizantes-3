@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Menú Principal</h1>
+
+    <h2>sesion</h2>
+    <button id="btnLogin">Login</button>
+    <button id="btnLogout">Logout</button>
+
+    <h2>Prueba de autorización</h2>
+    <button id="btnAuthorized">Ejecutar /log (permitido)</button>
+    <button id="btnUnauthorized">Ejecutar /sayHello (denegado)</button>
+
+    <pre id="resultArea"></pre>
+</body>
+
+<script>
+
+const API_URL = 'http://localhost:3000';
+
+let currentUser = null;         //aca guardo { userId, apiKey } después del login
+
+async function calcularHash(cadena)
+{
+    const encoder = new TextEncoder();
+    const data = encoder.encode(cadena);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+async function RPCWebAPIFetch(name, content, auth)
+{
+    const headers = { 'Content-Type': 'application/json' };
+
+    if (auth != null)
+    {
+        headers['x-user-id'] = auth.userId;
+        headers['x-api-key'] = auth.apiKey;
+    }
+
+    const response = await fetch(API_URL + name,
+    {
+        method: 'POST',
+        headers: headers,
+        body: content != null ? JSON.stringify(content) : null
+    });
+
+    const data = await response.json();
+
+    if (response.ok)
+    {
+        return data;
+    }
+    else
+    {
+        throw data;
+    }
+}
+
+async function doLogin()
+{
+    const username = prompt('Usuario:');
+    const password = prompt('Contraseña:');
+
+    const access_key = await calcularHash(password);
+    
+    try
+    {
+        const data = await RPCWebAPIFetch('/login', null, { userId: username, apiKey: access_key });
+        currentUser = { userId: username, apiKey: access_key };                                         //guardo sesion
+        document.getElementById('resultArea').innerText = JSON.stringify(data, null, 2);
+    }
+    catch ( error )
+    {
+        document.getElementById('resultArea').innerText = JSON.stringify(error, null, 2);
+    } 
+}
+
+async function doLogout()
+{
+    const username = prompt('Usuario:');
+    const password = prompt('Contraseña:');
+
+    const access_key = await calcularHash(password);
+    
+    try
+    {
+        const data = await RPCWebAPIFetch('/logout', null, { userId: username, apiKey: access_key });
+        document.getElementById('resultArea').innerText = JSON.stringify(data, null, 2);
+    }
+    catch ( error )
+    {
+        document.getElementById('resultArea').innerText = JSON.stringify(error, null, 2);
+    }
+   
+}
+
+async function checkAuthorize(endpointPath)
+{
+    if (currentUser == null)
+    {
+        document.getElementById('resultArea').innerText = 'Debés iniciar sesión primero';
+        return;
+    }
+
+    try
+    {
+        const data = await RPCWebAPIFetch( endpointPath, null, currentUser);
+        document.getElementById('resultArea').innerText = JSON.stringify(data, null, 2);
+    }
+    catch ( error )
+    {
+        document.getElementById('resultArea').innerText = JSON.stringify(error, null, 2);
+    }
+}
+
+function main()
+{
+    document.getElementById('btnLogin').onclick = doLogin;
+    document.getElementById('btnLogout').onclick = doLogout;
+    document.getElementById('btnAuthorized').onclick = () => checkAuthorize('/log');
+    document.getElementById('btnUnauthorized').onclick = () => checkAuthorize('/sayHello');
+}
+
+window.onload = main;
+
+</script>
+</html>
