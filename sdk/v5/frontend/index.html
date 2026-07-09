@@ -34,14 +34,14 @@ async function calcularHash(cadena)
     return hashHex;
 }
 
-async function RPCWebAPIFetch(name, content, auth)
+async function RPCWebAPIFetch(name, content)
 {
     const headers = { 'Content-Type': 'application/json' };
 
-    if (auth != null)
+    if (currentUser != null)
     {
-        headers['x-user-id'] = auth.userId;
-        headers['x-api-key'] = auth.apiKey;
+        headers['x-user-id'] = currentUser.userId;
+        headers['x-api-key'] = currentUser.apiKey;
     }
 
     const response = await fetch(API_URL + name,
@@ -70,14 +70,16 @@ async function doLogin()
 
     const access_key = await calcularHash(password);
     
+    currentUser = { userId: username, apiKey: access_key };                                         //guardo sesion
+
     try
     {
-        const data = await RPCWebAPIFetch('/login', null, { userId: username, apiKey: access_key });
-        currentUser = { userId: username, apiKey: access_key };                                         //guardo sesion
+        const data = await RPCWebAPIFetch('/login', null);
         document.getElementById('resultArea').innerText = JSON.stringify(data, null, 2);
     }
     catch ( error )
     {
+        currentUser = null;                     //si el login falla se limpia
         document.getElementById('resultArea').innerText = JSON.stringify(error, null, 2);
     } 
 }
@@ -88,10 +90,12 @@ async function doLogout()
     const password = prompt('Contraseña:');
 
     const access_key = await calcularHash(password);
+
+    currentUser = { userId: username, apiKey: access_key };
     
     try
     {
-        const data = await RPCWebAPIFetch('/logout', null, { userId: username, apiKey: access_key });
+        const data = await RPCWebAPIFetch('/logout', null);
         document.getElementById('resultArea').innerText = JSON.stringify(data, null, 2);
     }
     catch ( error )
@@ -111,7 +115,7 @@ async function checkAuthorize(endpointPath)
 
     try
     {
-        const data = await RPCWebAPIFetch( endpointPath, null, currentUser);
+        const data = await RPCWebAPIFetch( endpointPath, null);
         document.getElementById('resultArea').innerText = JSON.stringify(data, null, 2);
     }
     catch ( error )
