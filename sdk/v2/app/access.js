@@ -1,5 +1,7 @@
 // Lógica de negocio - accesos
-export function addAccess(db, id_group, id_endpoint)
+import { db } from './database.js';
+
+export function addAccess(id_group, id_endpoint)
 {
     const sql = "INSERT INTO access (id_group, id_endpoint) VALUES (?, ?)";
 
@@ -9,7 +11,7 @@ export function addAccess(db, id_group, id_endpoint)
     return { added: result.changes > 0 };
 }
 
-export function removeAccess(db, id_group, id_endpoint)
+export function removeAccess(id_group, id_endpoint)
 {
     const sql = "DELETE FROM access WHERE id_group = ? AND id_endpoint = ?";
 
@@ -19,7 +21,7 @@ export function removeAccess(db, id_group, id_endpoint)
     return { removed: result.changes > 0 };
 }
 
-export function getAccessByGroup(db, id_group)
+export function getAccessByGroup(id_group)
 {
     const sql = `SELECT endpoint.id, endpoint.path 
                  FROM endpoint 
@@ -32,7 +34,7 @@ export function getAccessByGroup(db, id_group)
     return rows;
 }
 
-export function getGroupsByEndpoint(db, id_endpoint)
+export function getGroupsByEndpoint(id_endpoint)
 {
     const sql = `SELECT "group".id, "group".name 
                  FROM "group" 

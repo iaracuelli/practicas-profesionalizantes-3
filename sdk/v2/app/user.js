@@ -1,7 +1,7 @@
 // Lógica de negocio
 import { db } from './database.js';
 
-export async function createUser(db, username, password) 
+export async function createUser(username, password) 
 {
     const sql = "INSERT INTO user (username, password) VALUES (?, ?) RETURNING id";
 
@@ -25,7 +25,7 @@ export async function createUser(db, username, password)
     }
 }
 
-export function deleteUser(db, id)
+export function deleteUser(id)
 {
     const sql = "DELETE FROM user WHERE id = ?";
 
@@ -35,7 +35,7 @@ export function deleteUser(db, id)
     return {deleted: result.changes > 0 };
 }
 
-export function updateUser(db, id, username, password)
+export function updateUser(id, username, password)
 {
     const sql = "UPDATE user SET username = ?, password = ? WHERE id = ?";
 
@@ -45,7 +45,7 @@ export function updateUser(db, id, username, password)
     return { updated: result.changes > 0 };
 }
 
-export function getUserById(db, id)
+export function getUserById(id)
 {
     const sql = "SELECT id, username FROM user WHERE id = ?";
 
@@ -55,7 +55,7 @@ export function getUserById(db, id)
     return row ?? null;
 }
 
-export function listUsers(db)
+export function listUsers()
 {
     const sql = "SELECT id, username FROM user";
 
@@ -66,7 +66,7 @@ export function listUsers(db)
 }
 
 
-export function login(db, username, password)
+export function login(username, password)
 {
     const sql = "SELECT id, username FROM user WHERE username = ? AND password = ?";
 

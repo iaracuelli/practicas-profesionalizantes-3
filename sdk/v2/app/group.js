@@ -1,7 +1,7 @@
 // Lógica de negocio - grupos
 import { db } from './database.js';  
 
-export function createGroup(db, name)
+export function createGroup(name)
 {
     const sql = "INSERT INTO \"group\" (name) VALUES (?) RETURNING id";
 
@@ -11,7 +11,7 @@ export function createGroup(db, name)
     return { id: row.id, name: name };
 }
 
-export function deleteGroup(db, id)
+export function deleteGroup(id)
 {
     const sql = "DELETE FROM \"group\" WHERE id = ?";
 
@@ -21,7 +21,7 @@ export function deleteGroup(db, id)
     return { deleted: result.changes > 0 };
 }
 
-export function updateGroup(db, id, name)
+export function updateGroup(id, name)
 {
     const sql = "UPDATE \"group\" SET name = ? WHERE id = ?";
 
@@ -31,7 +31,7 @@ export function updateGroup(db, id, name)
     return { updated: result.changes > 0 };
 }
 
-export function getGroupById(db, id)
+export function getGroupById(id)
 {
     const sql = "SELECT id, name FROM \"group\" WHERE id = ?";
 
@@ -41,7 +41,7 @@ export function getGroupById(db, id)
     return row ?? null;
 }
 
-export function listGroups(db)
+export function listGroups()
 {
     const sql = "SELECT id, name FROM \"group\"";
 

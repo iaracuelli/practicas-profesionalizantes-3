@@ -1,5 +1,7 @@
 // Lógica de negocio - endpoints
-export function createEndpoint(db, path)
+import { db } from './database.js';
+
+export function createEndpoint(path)
 {
     const sql = "INSERT INTO endpoint (path) VALUES (?) RETURNING id";
 
@@ -9,7 +11,7 @@ export function createEndpoint(db, path)
     return { id: row.id, path: path };
 }
 
-export function deleteEndpoint(db, id)
+export function deleteEndpoint(id)
 {
     const sql = "DELETE FROM endpoint WHERE id = ?";
 
@@ -19,7 +21,7 @@ export function deleteEndpoint(db, id)
     return { deleted: result.changes > 0 };
 }
 
-export function updateEndpoint(db, id, path)
+export function updateEndpoint(id, path)
 {
     const sql = "UPDATE endpoint SET path = ? WHERE id = ?";
 
@@ -29,7 +31,7 @@ export function updateEndpoint(db, id, path)
     return { updated: result.changes > 0 };
 }
 
-export function getEndpointById(db, id)
+export function getEndpointById(id)
 {
     const sql = "SELECT id, path FROM endpoint WHERE id = ?";
 
@@ -39,7 +41,7 @@ export function getEndpointById(db, id)
     return row ?? null;
 }
 
-export function listEndpoints(db)
+export function listEndpoints()
 {
     const sql = "SELECT id, path FROM endpoint";
 

@@ -1,5 +1,7 @@
 // Lógica de negocio - miembros
-export function addMember(db, id_user, id_group)
+import { db } from './database.js';
+
+export function addMember(id_user, id_group)
 {
     const sql = "INSERT INTO members (id_user, id_group) VALUES (?, ?)";
 
@@ -9,7 +11,7 @@ export function addMember(db, id_user, id_group)
     return { added: result.changes > 0 };
 }
 
-export function removeMember(db, id_user, id_group)
+export function removeMember(id_user, id_group)
 {
     const sql = "DELETE FROM members WHERE id_user = ? AND id_group = ?";
 
@@ -19,7 +21,7 @@ export function removeMember(db, id_user, id_group)
     return { removed: result.changes > 0 };
 }
 
-export function getMembersByGroup(db, id_group)
+export function getMembersByGroup(id_group)
 {
     const sql = `SELECT user.id, user.username 
                  FROM user 
@@ -32,7 +34,7 @@ export function getMembersByGroup(db, id_group)
     return rows;
 }
 
-export function getGroupsByUser(db, id_user)
+export function getGroupsByUser(id_user)
 {
     const sql = `SELECT "group".id, "group".name 
                  FROM "group" 
